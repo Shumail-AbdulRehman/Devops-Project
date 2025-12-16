@@ -1,0 +1,142 @@
+---
+# Ansible Playbook: Setup Users
+# Purpose: Create and configure users on target systems
+# Includes: User creation, SSH keys, sudo access
+
+- name: Setup users on target hosts
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  vars:
+    users_to_create:
+      - username: devops
+        groups: ['sudo', 'docker']
+        shell: /bin/bash
+        comment: "DevOps User"
+        ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+      
+      - username: deploy
+        groups: ['docker']
+        shell: /bin/bash
+        comment: "Deployment User"
+        ssh_key: ""
+      
+      - username: monitoring
+        groups: []
+        shell: /bin/bash
+        comment: "Monitoring User"
+        ssh_key: ""
+    
+    # Users that should be removed
+    users_to_remove: []
+  
+  tasks:
+    - name: Ensure required groups exist
+      group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - sudo
+        - docker
+    
+    - name: Create user accounts
+      user:
+        name: "{{ item.username }}"
+        groups: "{{ item.groups | join(',') }}"
+        shell: "{{ item.shell }}"
+        comment: "{{ item.comment }}"
+        create_home: yes
+        state: present
+      loop: "{{ users_to_create }}"
+    
+    - name: Set up authorized SSH keys
+      authorized_key:
+        user: "{{ item.username }}"
+        key: "{{ item.ssh_key }}"
+        state: present
+      loop: "{{ users_to_create }}"
+      when: item.ssh_key != ""
+    
+    - name: Allow sudo users to sudo without password
+      lineinfile:
+        path: /etc/sudoers.d/{{ item.username }}
+        line: "{{ item.username }} ALL=(ALL) NOPASSWD:ALL"
+        create: yes
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      loop: "{{ users_to_create }}"
+      when: "'sudo' in item.groups"
+    
+    - name: Set password expiration policy
+      user:
+        name: "{{ item.username }}"
+        password_expire_max: 90
+      loop: "{{ users_to_create }}"
+    
+    - name: Create .bashrc for users
+      template:
+        src: templates/bashrc.j2
+        dest: "/home/{{ item.username }}/.bashrc"
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0644'
+      loop: "{{ users_to_create }}"
+      when: false  # Disable if template doesn't exist
+    
+    - name: Configure SSH for users
+      blockinfile:
+        path: "/home/{{ item.username }}/.ssh/config"
+        create: yes
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0600'
+        block: |
+          Host *
+              ServerAliveInterval 60
+              ServerAliveCountMax 3
+              StrictHostKeyChecking no
+              UserKnownHostsFile=/dev/null
+      loop: "{{ users_to_create }}"
+    
+    - name: Remove unwanted users
+      user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      loop: "{{ users_to_remove }}"
+    
+    - name: Display created users
+      debug:
+        msg: "Created user: {{ item.username }} with groups: {{ item.groups }}"
+      loop: "{{ users_to_create }}"
+    
+    - name: Set up SSH hardening
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        block: |
+          PermitRootLogin no
+          PasswordAuthentication no
+          PubkeyAuthentication yes
+          ChallengeResponseAuthentication no
+          UsePAM yes
+          X11Forwarding no
+          PrintMotd no
+          AcceptEnv LANG LC_*
+        backup: yes
+      notify: Restart SSH
+    
+    - name: Ensure .ssh directory exists with correct permissions
+      file:
+        path: "/home/{{ item.username }}/.ssh"
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0700'
+      loop: "{{ users_to_create }}"
+  
+  handlers:
+    - name: Restart SSH
+      systemd:
+        name: sshd
+        state: restarted

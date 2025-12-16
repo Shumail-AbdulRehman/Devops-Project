@@ -1,0 +1,34 @@
+# GCP Infrastructure Configuration
+# Copy this file to terraform.tfvars and update with your values
+
+# GCP Project (REQUIRED)
+project_id = "your-gcp-project-id"  # CHANGE THIS!
+
+# GCP Region and Zone
+gcp_region = "us-central1"
+gcp_zone   = "us-central1-a"
+
+# Project Configuration
+project_name = "devops"
+environment  = "dev"
+
+# VPC Configuration
+vpc_cidr           = "10.2.0.0/16"
+enable_nat_gateway = true
+
+# GKE Configuration
+cluster_name      = "devops-gke-cluster"
+use_autopilot     = true  # Recommended for cost optimization
+node_machine_type = "e2-standard-2"  # Only used if autopilot = false
+node_count        = 1
+node_min_count    = 1
+node_max_count    = 3
+node_disk_size    = 50
+use_preemptible   = false  # Set to true for 80% cost savings
+
+# Cloud SQL Configuration
+db_tier      = "db-f1-micro"  # Smallest tier
+db_disk_size = 10
+db_name      = "appdb"
+db_username  = "dbuser"
+db_password  = "ChangeMe123!"  # IMPORTANT: Change this!

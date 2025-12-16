@@ -1,0 +1,31 @@
+# AWS Infrastructure Configuration
+# Copy this file to terraform.tfvars and update with your values
+
+# AWS Region
+aws_region = "us-east-1"
+
+# Project Configuration
+project_name = "devops-multicloud"
+environment  = "dev"
+
+# VPC Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b"]
+enable_nat_gateway = true  # Set to false to save costs (~$30/month)
+
+# EKS Configuration
+cluster_name              = "devops-eks-cluster"
+kubernetes_version        = "1.28"
+node_instance_types       = ["t3.medium"]  # Use t3.small for lower costs
+node_group_desired_size   = 1
+node_group_min_size       = 1
+node_group_max_size       = 3
+node_disk_size            = 50
+capacity_type             = "ON_DEMAND"  # Use "SPOT" for 70% cost savings
+
+# RDS Configuration
+db_instance_class    = "db.t3.micro"  # Free tier eligible
+db_allocated_storage = 20
+db_name              = "appdb"
+db_username          = "admin"
+db_password          = "ChangeMe123!"  # IMPORTANT: Change this and use AWS Secrets Manager in production!

@@ -1,0 +1,29 @@
+# Azure Infrastructure Configuration
+# Copy this file to terraform.tfvars and update with your values
+
+# Azure Region
+azure_region = "eastus"
+
+# Project Configuration
+project_name = "devops"
+environment  = "dev"
+
+# VNet Configuration
+vnet_cidr          = "10.1.0.0/16"
+enable_nat_gateway = false  # Set to true if needed (~$33/month cost)
+
+# AKS Configuration
+cluster_name       = "devops-aks-cluster"
+kubernetes_version = "1.28"
+node_vm_size       = "Standard_B2ms"  # 2 vCPU, 8GB RAM
+node_count         = 1
+node_min_count     = 1
+node_max_count     = 3
+node_disk_size     = 128
+
+# Database Configuration
+db_sku_name    = "B_Standard_B1s"  # Burstable tier
+db_storage_gb  = 20
+db_name        = "appdb"
+db_username    = "azureuser"
+db_password    = "ChangeMe123!"  # IMPORTANT: Change this!

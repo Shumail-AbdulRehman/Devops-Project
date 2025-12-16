@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ansible
+*.retry
+.vault_pass
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+k8s-join-command.sh
+
+# Secrets
+*.key
+*.pem
+*.crt
+secrets/
+credentials/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+*.zip
+*.tar.gz
+
+# Cloud provider credentials
+terraform-gcp-key.json
+.aws/
+.azure/
+
+# CI/CD artifacts
+trivy-report.json
+sonar-scanner/
+.scannerwork/

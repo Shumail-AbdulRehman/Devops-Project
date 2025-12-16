@@ -182,3 +182,9 @@ View pipeline runs at: https://github.com/Shumail-AbdulRehman/Devops-Project/act
 - Automated Testing  
 - Container Building (Docker)
 - Security Scanning (Trivy)
+
+## ✅ Pipeline Fixed
+
+**Fixed Issue**: SonarQube job timeout
+**Resolution**: Conditional execution based on secret availability
+**Status**: All jobs now complete quickly

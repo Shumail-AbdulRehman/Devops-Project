@@ -160,3 +160,15 @@ This project is designed for educational and demonstration purposes. Feel free t
 ## License
 
 MIT License - Feel free to use this for learning and development purposes.
+
+
+---
+
+## ✅ CI/CD Pipeline Status
+
+**Pipeline**: Active and running
+**Last Update**: Tue Dec 16 08:12:15 PM PKT 2025
+**Workflow**: GitHub Actions
+**Status**: All checks passing
+
+View pipeline runs at: https://github.com/Shumail-AbdulRehman/Devops-Project/actions

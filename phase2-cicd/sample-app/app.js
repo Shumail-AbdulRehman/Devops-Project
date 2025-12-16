@@ -59,19 +59,21 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-const server = app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('SIGTERM signal received: closing HTTP server');
-    server.close(() => {
-        console.log('HTTP server closed');
-        process.exit(0);
+// Only start server if run directly (not imported by tests)
+if (require.main === module) {
+    const server = app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+        console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
-});
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+        console.log('SIGTERM signal received: closing HTTP server');
+        server.close(() => {
+            console.log('HTTP server closed');
+            process.exit(0);
+        });
+    });
+}
 
 module.exports = app;
